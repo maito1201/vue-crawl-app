@@ -1,5 +1,7 @@
 <template>
   <div class='main'>
+    <p>{{data}}</p>
+    <input @click="getData" type="button" value="取得">
     <div class="row mr-2 ml-2">
       <div v-for="item in items" :key="item.id" class="col-md-3 col-sm-6 p-2">
         <div class="card p-0 pb-3 shadow">
@@ -27,12 +29,34 @@ function getItems(){
     { id: 8, name: "商品名", price: 1000, image: "画像URL" }
   ]
 }
+
 let items = getItems();
 export default {
   name: 'Main',
   data: function (){
     return {
-      items: items
+      items: items,
+      data: "test",
+      searchPath: "https://google.com"
+    }
+  },
+  methods: {
+    getData(){
+      this.axios.get(
+        this.searchPath, {
+          mode: 'no-cors',
+          headers: {
+            'Access-Control-Allow-Origin': '*',
+            'Content-Type': 'application/json',
+          },
+          withCredentials: true,
+          credentials: 'same-origin'
+        }
+      ).then((response) => {
+        this.data = response.data;
+      }).catch((e) => {
+        alert(e);
+      });
     }
   }
 }
