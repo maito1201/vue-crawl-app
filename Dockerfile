@@ -5,5 +5,5 @@ WORKDIR /myapp
 COPY package.json ./
 COPY yarn.lock ./
 
-RUN yarn install
+RUN yarn install && yarn global add @vue/cli
 

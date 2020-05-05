@@ -1,7 +1,7 @@
 <template>
   <div class='main'>
     <h1>Hello My Vue</h1>
-    <p>{{ msg }}</p>
+    <p class="text-danger">{{ msg }}</p>
   </div>
 </template>
 
