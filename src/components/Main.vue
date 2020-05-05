@@ -1,15 +1,39 @@
 <template>
   <div class='main'>
-    <h1>Hello My Vue</h1>
-    <p class="text-danger">{{ msg }}</p>
+    <div class="row mr-2 ml-2">
+      <div v-for="item in items" :key="item.id" class="col-md-3 col-sm-6 p-2">
+        <div class="card p-0 pb-3 shadow">
+          <!-- TODO: 取得した画像を表示 <img :src="item.image" class="card-img-top"> -->
+          <img src="@/assets/dummy.jpg" class="card-img-top">
+          <p class="card-title">{{ item.name }}</p>
+          <p class="card-text font-weight-bolder">¥{{ item.price }}</p>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
 <script>
+// TODO: 良い感じにクローリングしてデータを成型する関数かAPIを作る
+function getItems(){
+  return [
+    { id: 1, name: "商品名", price: 1000, image: "画像URL" },
+    { id: 2, name: "商品名", price: 1000, image: "画像URL" },
+    { id: 3, name: "商品名", price: 1000, image: "画像URL" },
+    { id: 4, name: "商品名", price: 1000, image: "画像URL" },
+    { id: 5, name: "商品名", price: 1000, image: "画像URL" },
+    { id: 6, name: "商品名", price: 1000, image: "画像URL" },
+    { id: 7, name: "商品名", price: 1000, image: "画像URL" },
+    { id: 8, name: "商品名", price: 1000, image: "画像URL" }
+  ]
+}
+let items = getItems();
 export default {
   name: 'Main',
-  props: {
-    msg: String
+  data: function (){
+    return {
+      items: items
+    }
   }
 }
 </script>
