@@ -1,6 +1,5 @@
  <template>
     <div v-if="isLoading">
-       <h4>loading...</h4>
        <vue-loading type="bubbles" color="#28a745" :size="{ width: '50px', height: '50px' }"></vue-loading>    
     </div>
  </template>

@@ -1,5 +1,7 @@
 <template>
+  <pull-to :top-load-method="getItems" :top-config="pullToConfig">
   <div class='main'>
+    <Loading :isLoading="isLoading"/>
     <div class="row mr-2 ml-2">
       <div class="input-group col-xl-3 col-md-6 p-2">
         <input type="text" class="form-control" v-model="keyword">
@@ -8,7 +10,6 @@
         </div>
       </div>
     </div>
-    <Loading :isLoading="isLoading"/>
     <div class="col-12">
       <div class="alert alert-secondary" v-if="items.length == 0">
         <p class="m-0" >一致する商品はありません</p>
@@ -27,17 +28,30 @@
       </div>
     </div>
   </div>
+  </pull-to>
 </template>
 
 <script>
 import Loading from './Loading.vue'
+import PullTo from 'vue-pull-to'
 export default {
   name: 'Main',
   components: {
-    Loading
+    Loading,
+    PullTo
   },
   data: function (){
     return {
+      pullToConfig: {
+        pullText: 'pull to reload',
+        triggerText: 'release',
+        loadingText: '',
+        doneText: '',
+        failText: '',
+        loadedStayTime: 0,
+        stayDistance: 50,
+        triggerDistance: 70
+      },
       items: [],
       keyword: "",
       searched: "",
@@ -46,7 +60,8 @@ export default {
     }
   },
   methods: {
-    getItems(){
+    getItems(loaded){
+      if (typeof(loaded) == "function") { loaded('done'); }
       if(this.isLoading) { return }
       this.isLoading = true;
       this.axios.get(
