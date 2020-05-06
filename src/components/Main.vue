@@ -1,47 +1,32 @@
 <template>
   <div class='main'>
-    <p>{{data}}</p>
-    <input @click="getData" type="button" value="取得">
+    <input @click="getItems" type="button" value="取得">
     <div class="row mr-2 ml-2">
       <div v-for="item in items" :key="item.id" class="col-md-3 col-sm-6 p-2">
-        <div class="card p-0 pb-3 shadow">
-          <!-- TODO: 取得した画像を表示 <img :src="item.image" class="card-img-top"> -->
-          <img src="@/assets/dummy.jpg" class="card-img-top">
-          <p class="card-title">{{ item.name }}</p>
-          <p class="card-text font-weight-bolder">¥{{ item.price }}</p>
-        </div>
+        <a :href="item.Url" target="_blank">
+          <div class="card p-0 pb-3 shadow">
+            <img :src="item.Image" class="card-img-top">
+            <p class="card-title">{{ item.Name }}</p>
+            <p class="card-text font-weight-bolder">{{ item.Price }}</p>
+          </div>
+        </a>
       </div>
     </div>
   </div>
 </template>
 
 <script>
-// TODO: 良い感じにクローリングしてデータを成型する関数かAPIを作る
-function getItems(){
-  return [
-    { id: 1, name: "商品名", price: 1000, image: "画像URL" },
-    { id: 2, name: "商品名", price: 1000, image: "画像URL" },
-    { id: 3, name: "商品名", price: 1000, image: "画像URL" },
-    { id: 4, name: "商品名", price: 1000, image: "画像URL" },
-    { id: 5, name: "商品名", price: 1000, image: "画像URL" },
-    { id: 6, name: "商品名", price: 1000, image: "画像URL" },
-    { id: 7, name: "商品名", price: 1000, image: "画像URL" },
-    { id: 8, name: "商品名", price: 1000, image: "画像URL" }
-  ]
-}
 
-let items = getItems();
 export default {
   name: 'Main',
   data: function (){
     return {
-      items: items,
-      data: "test",
-      searchPath: "https://google.com"
+      items: [],
+      searchPath: "/api/digimart?keyword=dingwall"
     }
   },
   methods: {
-    getData(){
+    getItems(){
       this.axios.get(
         this.searchPath, {
           mode: 'no-cors',
@@ -53,7 +38,7 @@ export default {
           credentials: 'same-origin'
         }
       ).then((response) => {
-        this.data = response.data;
+        this.items = response.data;
       }).catch((e) => {
         alert(e);
       });

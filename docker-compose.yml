@@ -1,6 +1,17 @@
 version: '3'
+volumes:
+  vendor:
 services:
-  view:
+  api:
+    image: golang:latest
+    container_name: go_container
+    command: go run api.go
+    tty: true
+    ports:
+      - "3000:3000"
+    volumes:
+      - .:/go
+  app:
     build: .
     command: sh -c "yarn --force && yarn run serve"
     volumes:
@@ -8,4 +19,3 @@ services:
       - /myapp/node_modules
     ports:
       - "8000:8080"
-
