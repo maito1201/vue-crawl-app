@@ -1,6 +1,15 @@
 <template>
   <div class='main'>
-    <carousel :per-page="1"  :mouse-drag="false">
+    <carousel
+      :per-page="1"
+      :mouse-drag="false"
+      :minSwipeDistance="50"
+      :paginationPosition="'top'"
+      :paginationPadding="2"
+      :paginationSize="8"
+      ref="carousel"
+      v-touch:swipe.bottom="reloadItems"
+    >
       <slide v-for="condition in conditions" :key="condition.id">
         <Loading :isLoading="condition.isLoading"/>
         <div class="row mr-2 ml-2">
@@ -120,8 +129,13 @@ export default {
       });
     },
     reloadItems(loaded){
+      if(window.scrollY != 0) { return }
       const index = this.$refs.carousel ? this.$refs.carousel.currentPage : 0;
       this.getItems(this.conditions[index], loaded);
+    },
+    Test(){
+      let val = window.scrollY;
+      console.log(val)
     }
   }
 }
