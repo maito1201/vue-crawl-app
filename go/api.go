@@ -1,6 +1,7 @@
 package main
 
 import (
+  "strings"
   "time"
   "net/http"
   "encoding/json"
@@ -39,7 +40,8 @@ func main() {
   }))
 
   router.GET("/digimart", func(c *gin.Context) {
-    url := "http://www.digimart.net/search?keywordAnd=" + c.Query("keyword")
+    keyword := c.Query("keyword")
+    url := "http://www.digimart.net/search?keywordAnd=" + strings.Replace(keyword, " ", "+", -1)
     ret := scrapeDigimart(url)
     c.String(http.StatusOK, string(ret))
   })
