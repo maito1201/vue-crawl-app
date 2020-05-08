@@ -50,6 +50,7 @@ export default {
   },
   data: function (){
     return {
+      storedConditions: [],
       conditions: [
         {
           id: 0,
@@ -101,6 +102,7 @@ export default {
     }
   },
   methods: {
+    // アイテム読み込み
     getItems(condition, loaded){
       if (typeof(loaded) == "function") { loaded('done'); }
       if(condition.isLoading) { return }
@@ -116,22 +118,48 @@ export default {
           credentials: 'same-origin'
         }
       ).then((response) => {
-        condition.searched = condition.keyword;
-        condition.items = response.data;
+        this.setDatas(response, condition)
       }).catch((e) => {
         alert(e);
       }).finally(() => {
         condition.isLoading = false;
       });
     },
+    // 下にスワイプしてリロード
     reloadItems(loaded){
       if(window.scrollY != 0) { return }
       const index = this.$refs.carousel ? this.$refs.carousel.currentPage : 0;
       this.getItems(this.conditions[index], loaded);
     },
-    Test(){
-      let val = window.scrollY;
-      console.log(val)
+    // ページ再訪、リロード時にcookieの情報をもとに再検索
+    resumeItems(loaded){
+      const func = this.getItems;
+      this.conditions.forEach(function(condition){
+        if(condition.keyword != ""){
+          func(condition, loaded);
+        }
+      });
+    },
+    setDatas(response, condition){
+      condition.searched = condition.keyword;
+      condition.items = response.data;
+      this.storedConditions = this.conditions.map(function(condition) {
+        return { keyword : condition.keyword }
+      });
+      localStorage.setItem('storedConditions', JSON.stringify(this.storedConditions));
+    }
+  },
+  mounted() {
+    if (localStorage.getItem('storedConditions')) {
+      try {
+        this.storedConditions = JSON.parse(localStorage.getItem('storedConditions'));
+        for( var i=0; i < this.conditions.length; i++) {
+          this.conditions[i].keyword = this.storedConditions[i].keyword;
+        }
+        this.resumeItems();
+      } catch(e) {
+        localStorage.removeItem('storedConditions');
+      }
     }
   }
 }
