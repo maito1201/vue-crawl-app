@@ -23,18 +23,12 @@
         <div class="col-12">
           <div class="alert alert-secondary" v-if="condition.items.length == 0">
             <p class="m-0" >一致する商品はありません</p>
-            <p class="m-0" v-if="condition.searched.length">キーワード: {{searched}}</p>
+            <p class="m-0" v-if="condition.searched.length">キーワード: {{condition.searched}}</p>
           </div>
         </div>
         <div class="row mr-2 ml-2">
           <div v-for="item in condition.items" :key="item.id" class="col-md-3 col-sm-6 col-6 p-2">
-            <a :href="item.Url" target="_blank">
-              <div class="card p-0 pb-3 shadow">
-                <img :src="item.Image" class="card-img-top">
-                <p class="card-title">{{ item.Name }}</p>
-                <p class="card-text font-weight-bolder">{{ item.Price }}</p>
-              </div>
-            </a>
+            <ItemCard :item="item"/>
           </div>
         </div>
       </slide>
@@ -43,11 +37,13 @@
 </template>
 
 <script>
+import ItemCard from './ItemCard.vue'
 import Loading from './Loading.vue'
 import { Carousel, Slide } from 'vue-carousel';
 export default {
   name: 'Main',
   components: {
+    ItemCard,
     Loading,
     Carousel,
     Slide
