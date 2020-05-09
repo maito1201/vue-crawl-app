@@ -1,5 +1,5 @@
 <template>
-  <div class='main'>
+  <div class="main">
     <carousel
       :per-page="1"
       :mouse-drag="false"
@@ -14,6 +14,11 @@
         <Loading :isLoading="condition.isLoading"/>
         <div class="row mr-2 ml-2">
           <div class="input-group col-xl-3 col-md-6 p-2">
+            <select class="form-control" v-model="condition.searchPath">
+              <option v-for="option in selectOptions" v-bind:key="option.text" v-bind:value="option.value">
+                {{ option.text }}
+              </option>
+            </select>
             <input type="text" class="form-control" v-model="condition.keyword">
             <div class="input-group-append">
               <button type="button" class="btn btn-outline-success" @click="getItems(condition)">Search</button>
@@ -37,11 +42,11 @@
 </template>
 
 <script>
-import ItemCard from './ItemCard.vue'
-import Loading from './Loading.vue'
-import { Carousel, Slide } from 'vue-carousel';
+import ItemCard from "./ItemCard.vue"
+import Loading from "./Loading.vue"
+import { Carousel, Slide } from "vue-carousel";
 export default {
-  name: 'Main',
+  name: "Main",
   components: {
     ItemCard,
     Loading,
@@ -57,9 +62,8 @@ export default {
           items: [],
           keyword: "",
           searched: "",
-          searchPath: "/api/digimart?keyword=",
-          isLoading: false,
-          cssClass: "carousel-item active"
+          searchPath: "/api/digimart?keyword",
+          isLoading: false
         },
         {
           id: 1,
@@ -67,8 +71,7 @@ export default {
           keyword: "",
           searched: "",
           searchPath: "/api/digimart?keyword=",
-          isLoading: false,
-          cssClass: "carousel-item"
+          isLoading: false
         },
         {
           id: 3,
@@ -76,8 +79,7 @@ export default {
           keyword: "",
           searched: "",
           searchPath: "/api/digimart?keyword=",
-          isLoading: false,
-          cssClass: "carousel-item"
+          isLoading: false
         },
         {
           id: 4,
@@ -85,8 +87,7 @@ export default {
           keyword: "",
           searched: "",
           searchPath: "/api/digimart?keyword=",
-          isLoading: false,
-          cssClass: "carousel-item"
+          isLoading: false
         },
         {
           id: 5,
@@ -94,28 +95,30 @@ export default {
           keyword: "",
           searched: "",
           searchPath: "/api/digimart?keyword=",
-          isLoading: false,
-          cssClass: "carousel-item"
+          isLoading: false
         }
       ],
-      isLoading: false
+      selectOptions: [
+        { text: "メルカリ", value: "/api/mercari?keyword=" },
+        { text: "デジマート", value: "/api/digimart?keyword=" }
+      ]
     }
   },
   methods: {
     // アイテム読み込み
     getItems(condition, loaded){
-      if (typeof(loaded) == "function") { loaded('done'); }
+      if (typeof(loaded) == "function") { loaded("done"); }
       if(condition.isLoading) { return }
       condition.isLoading = true;
       this.axios.get(
         `${condition.searchPath}${condition.keyword}`, {
-          mode: 'no-cors',
+          mode: "no-cors",
           headers: {
-            'Access-Control-Allow-Origin': '*',
-            'Content-Type': 'application/json',
+            "Access-Control-Allow-Origin": "*",
+            "Content-Type": "application/json",
           },
           withCredentials: true,
-          credentials: 'same-origin'
+          credentials: "same-origin"
         }
       ).then((response) => {
         this.setDatas(response, condition)
@@ -135,7 +138,7 @@ export default {
     resumeItems(loaded){
       const func = this.getItems;
       this.conditions.forEach(function(condition){
-        if(condition.keyword != ""){
+        if(condition.keyword != "" && condition.searchPath != ""){
           func(condition, loaded);
         }
       });
@@ -144,21 +147,22 @@ export default {
       condition.searched = condition.keyword;
       condition.items = response.data;
       this.storedConditions = this.conditions.map(function(condition) {
-        return { keyword : condition.keyword }
+        return { keyword : condition.keyword, searchPath : condition.searchPath }
       });
-      localStorage.setItem('storedConditions', JSON.stringify(this.storedConditions));
+      localStorage.setItem("storedConditions", JSON.stringify(this.storedConditions));
     }
   },
   mounted() {
-    if (localStorage.getItem('storedConditions')) {
+    if (localStorage.getItem("storedConditions")) {
       try {
-        this.storedConditions = JSON.parse(localStorage.getItem('storedConditions'));
+        this.storedConditions = JSON.parse(localStorage.getItem("storedConditions"));
         for( var i=0; i < this.conditions.length; i++) {
           this.conditions[i].keyword = this.storedConditions[i].keyword;
+          this.conditions[i].searchPath = this.storedConditions[i].searchPath;
         }
         this.resumeItems();
       } catch(e) {
-        localStorage.removeItem('storedConditions');
+        localStorage.removeItem("storedConditions");
       }
     }
   }

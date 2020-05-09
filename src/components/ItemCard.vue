@@ -32,7 +32,7 @@ export default {
       const len = 20;
       if (!str) return ''
       let truncated = str.substr(0, len);
-      if (truncated.bytes() > 22) truncated = str.substr(0, 15)
+      if (truncated.bytes() > 23) truncated = str.substr(0, 12)
       return str.length <= len ? str : (truncated + "...");
     }
   }
@@ -47,5 +47,7 @@ export default {
 .card-text{
   color: #B12704;
 }
+.card-img-top{
+  height: 161.5px;
+}
 </style>
-  

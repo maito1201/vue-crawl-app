@@ -46,6 +46,13 @@ func main() {
     c.String(http.StatusOK, string(ret))
   })
 
+  router.GET("/mercari", func(c *gin.Context) {
+    keyword := c.Query("keyword")
+    url := "https://www.mercari.com/jp/search/?keyword=" + strings.Replace(keyword, " ", "+", -1)
+    ret := scrapeMercari(url)
+    c.String(http.StatusOK, string(ret))
+  })
+
   router.Run(":3000")
 }
 
@@ -62,6 +69,27 @@ func scrapeDigimart(url string) string {
     name := s.Find("p.ttl").Find("a").Text()
     price := s.Find("p.price").First().Text()
     image := s.Find("div.pic").Find("img").AttrOr("src", "")
+    item := Item{ Url: url, Name: name, Price: price, Image: image }
+    items = append(items, item)
+  })
+
+  json, _ := json.Marshal(items)
+  return string(json)
+}
+
+func scrapeMercari(url string) string {
+  items := []Item{}
+  doc, err := goquery.NewDocument(url)
+  if err != nil {
+    return("")
+  }
+
+  selection := doc.Find("div.items-box-content.clearfix").Find("section.items-box")
+  selection.Each(func(index int, s *goquery.Selection) {
+    url := "https://www.mercari.com" + s.Find("a").AttrOr("href", "")
+    name := s.Find("a").Find("h3.items-box-name").Text()
+    price := s.Find("a").Find("div.items-box-price").Text()
+    image := s.Find("a").Find("figure.items-box-photo").Find("img").AttrOr("data-src", "")
     item := Item{ Url: url, Name: name, Price: price, Image: image }
     items = append(items, item)
   })
