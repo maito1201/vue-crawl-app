@@ -5,7 +5,9 @@ services:
   api:
     image: golang:latest
     container_name: go_container
-    command: sh -c "export GOPATH= && go run go/api.go"
+    command: go run go/api.go
+    environment: 
+      - GOPATH=
     tty: true
     ports:
       - "3000:3000"
