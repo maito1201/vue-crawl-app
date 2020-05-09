@@ -53,6 +53,10 @@ func main() {
     c.String(http.StatusOK, string(ret))
   })
 
+  router.NoRoute(func (c *gin.Context) {
+    c.String(http.StatusOK, "")
+  })
+
   router.Run(":3000")
 }
 
