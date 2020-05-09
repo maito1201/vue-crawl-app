@@ -127,7 +127,7 @@ export default {
     },
     // 下にスワイプしてリロード
     reloadItems(loaded){
-      if(window.scrollY != 0) { return }
+      if(window.scrollY > 30) { return }
       const index = this.$refs.carousel ? this.$refs.carousel.currentPage : 0;
       this.getItems(this.conditions[index], loaded);
     },
