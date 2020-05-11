@@ -53,6 +53,13 @@ func main() {
     c.String(http.StatusOK, string(ret))
   })
 
+  router.GET("/yahoo", func(c *gin.Context) {
+    keyword := c.Query("keyword")
+    url := "https://auctions.yahoo.co.jp/search/search?p=" + strings.Replace(keyword, " ", "+", -1)
+    ret := scrapeYahoo(url)
+    c.String(http.StatusOK, string(ret))
+  })
+
   router.NoRoute(func (c *gin.Context) {
     c.String(http.StatusOK, "")
   })
@@ -98,6 +105,25 @@ func scrapeMercari(url string) string {
     items = append(items, item)
   })
 
+  json, _ := json.Marshal(items)
+  return string(json)
+}
+
+func scrapeYahoo(url string) string {
+  items := []Item{}
+  doc, err := goquery.NewDocument(url)
+  if err != nil {
+    return("")
+  }
+  selection := doc.Find("ul.Products__items").Find("li.Product")
+  selection.Each(func(index int, s *goquery.Selection) {
+    url := s.Find("div.Product__image").Find("a").AttrOr("href", "")
+    name := s.Find("h3.Product__title").Text()
+    price := s.Find("span.Product__priceValue").First().Text()
+    image := s.Find("div.Product__image").Find("img").AttrOr("src", "")
+    item := Item{ Url: url, Name: name, Price: price, Image: image }
+    items = append(items, item)
+  })
   json, _ := json.Marshal(items)
   return string(json)
 }

@@ -48,6 +48,8 @@ export default {
   color: #B12704;
 }
 .card-img-top{
+  max-width: 100%;
   height: 161.5px;
+  object-fit: contain;
 }
 </style>
