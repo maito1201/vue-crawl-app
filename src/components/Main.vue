@@ -1,5 +1,5 @@
 <template>
-  <div class="main">
+  <div class="main" style="height: 80vh">
     <carousel
       :per-page="1"
       :mouse-drag="false"
@@ -25,15 +25,17 @@
             </div>
           </div>
         </div>
-        <div class="col-12">
-          <div class="alert alert-secondary" v-if="condition.items.length == 0">
-            <p class="m-0" >一致する商品はありません</p>
-            <p class="m-0" v-if="condition.searched.length">キーワード: {{condition.searched}}</p>
+        <div style="height: 80vh; overflow: scroll" ref="itemBody">
+          <div class="col-12">
+            <div class="alert alert-secondary" v-if="condition.items.length == 0">
+              <p class="m-0" >一致する商品はありません</p>
+              <p class="m-0" v-if="condition.searched.length">キーワード: {{condition.searched}}</p>
+            </div>
           </div>
-        </div>
-        <div class="row mr-2 ml-2">
-          <div v-for="item in condition.items" :key="item.id" class="col-md-3 col-sm-6 col-6 p-2">
-            <ItemCard :item="item"/>
+          <div class="row mr-2 ml-2">
+            <div v-for="item in condition.items" :key="item.id" class="col-md-3 col-sm-6 col-6 p-2">
+              <ItemCard :item="item"/>
+            </div>
           </div>
         </div>
       </slide>
@@ -74,6 +76,14 @@ export default {
           isLoading: false
         },
         {
+          id: 2,
+          items: [],
+          keyword: "",
+          searched: "",
+          searchPath: "/api/digimart?keyword=",
+          isLoading: false
+        },
+        {
           id: 3,
           items: [],
           keyword: "",
@@ -83,14 +93,6 @@ export default {
         },
         {
           id: 4,
-          items: [],
-          keyword: "",
-          searched: "",
-          searchPath: "/api/digimart?keyword=",
-          isLoading: false
-        },
-        {
-          id: 5,
           items: [],
           keyword: "",
           searched: "",
@@ -131,8 +133,8 @@ export default {
     },
     // 下にスワイプしてリロード
     reloadItems(loaded){
-      if(window.scrollY > 30) { return }
-      const index = this.$refs.carousel ? this.$refs.carousel.currentPage : 0;
+      const index = this.currentCarousel();
+      if(this.$refs.itemBody[index].scrollTop > 30) { return }
       this.getItems(this.conditions[index], loaded);
     },
     // ページ再訪、リロード時にcookieの情報をもとに再検索
@@ -151,6 +153,9 @@ export default {
         return { keyword : condition.keyword, searchPath : condition.searchPath }
       });
       localStorage.setItem("storedConditions", JSON.stringify(this.storedConditions));
+    },
+    currentCarousel(){
+      return this.$refs.carousel ? this.$refs.carousel.currentPage : 0;
     }
   },
   mounted() {
