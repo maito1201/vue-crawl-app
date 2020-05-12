@@ -1,5 +1,20 @@
 <template>
   <div class="main" style="height: 80vh">
+    <div v-for="condition in conditions" :key="condition.id">
+      <div class="row mr-2 ml-2" v-if="current == condition.id">
+        <div class="input-group col-xl-3 col-md-6 p-2">
+          <select class="form-control" v-model="condition.searchPath">
+            <option v-for="option in selectOptions" v-bind:key="option.text" v-bind:value="option.value">
+              {{ option.text }}
+            </option>
+          </select>
+          <input type="text" class="form-control" v-model="condition.keyword">
+          <div class="input-group-append">
+            <button type="button" class="btn btn-outline-success" @click="getItems(condition)">Search</button>
+          </div>
+        </div>
+      </div>
+    </div>
     <carousel
       :per-page="1"
       :mouse-drag="false"
@@ -9,25 +24,13 @@
       :paginationSize="8"
       ref="carousel"
       v-touch:swipe.bottom="reloadItems"
+      @page-change="updateCurrent"
     >
       <slide v-for="condition in conditions" :key="condition.id">
         <Loading :isLoading="condition.isLoading"/>
-        <div class="row mr-2 ml-2">
-          <div class="input-group col-xl-3 col-md-6 p-2">
-            <select class="form-control" v-model="condition.searchPath">
-              <option v-for="option in selectOptions" v-bind:key="option.text" v-bind:value="option.value">
-                {{ option.text }}
-              </option>
-            </select>
-            <input type="text" class="form-control" v-model="condition.keyword">
-            <div class="input-group-append">
-              <button type="button" class="btn btn-outline-success" @click="getItems(condition)">Search</button>
-            </div>
-          </div>
-        </div>
         <div style="height: 80vh; overflow: scroll" ref="itemBody">
-          <div class="col-12">
-            <div class="alert alert-secondary" v-if="condition.items.length == 0">
+          <div class="col-12" v-if="condition.items.length == 0">
+            <div class="alert alert-secondary">
               <p class="m-0" >一致する商品はありません</p>
               <p class="m-0" v-if="condition.searched.length">キーワード: {{condition.searched}}</p>
             </div>
@@ -57,6 +60,7 @@ export default {
   },
   data: function (){
     return {
+      current: 0,
       storedConditions: [],
       conditions: [
         {
@@ -156,6 +160,9 @@ export default {
     },
     currentCarousel(){
       return this.$refs.carousel ? this.$refs.carousel.currentPage : 0;
+    },
+    updateCurrent(){
+      this.current = this.currentCarousel();
     }
   },
   mounted() {
