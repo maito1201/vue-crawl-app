@@ -5,6 +5,7 @@ import (
   "time"
   "net/http"
   "encoding/json"
+  "github.com/sclevine/agouti"
   "github.com/PuerkitoBio/goquery"
   "github.com/gin-gonic/gin"
   "github.com/gin-contrib/cors"
@@ -57,6 +58,13 @@ func main() {
     keyword := c.Query("keyword")
     url := "https://auctions.yahoo.co.jp/search/search?p=" + strings.Replace(keyword, " ", "+", -1)
     ret := scrapeYahoo(url)
+    c.String(http.StatusOK, string(ret))
+  })
+
+  router.GET("/reverb", func(c *gin.Context) {
+    keyword := c.Query("keyword")
+    url := "http://reverb.com/marketplace?query=" + strings.Replace(keyword, " ", "+", -1)
+    ret := scrapeReverb(url)
     c.String(http.StatusOK, string(ret))
   })
 
@@ -123,6 +131,42 @@ func scrapeYahoo(url string) string {
     image := s.Find("div.Product__image").Find("img").AttrOr("src", "")
     item := Item{ Url: url, Name: name, Price: price, Image: image }
     items = append(items, item)
+  })
+  json, _ := json.Marshal(items)
+  return string(json)
+}
+
+func scrapeReverb(url string) string {
+  items := []Item{}
+  driver := agouti.ChromeDriver(
+    agouti.ChromeOptions("args", []string{
+        "--headless",
+        "--window-size=30,120",
+        "--disable-gpu",                        // ref: https://developers.google.com/web/updates/2017/04/headless-chrome#cli
+        "no-sandbox",                           // ref: https://github.com/theintern/intern/issues/878
+        "disable-dev-shm-usage",                // ref: https://qiita.com/yoshi10321/items/8b7e6ed2c2c15c3344c6
+    }),
+  )
+
+  driver.Start()
+  defer driver.Stop()
+  page, _ := driver.NewPage(agouti.Browser("chrome"))
+  page.Navigate(url)
+  // 描画の完了を待機
+  time.Sleep(7 * time.Second)
+  content, _ := page.HTML()
+  reader := strings.NewReader(content)
+  doc, _ := goquery.NewDocumentFromReader(reader)
+  selection := doc.Find("ul.tiles.tiles--four-wide-max").Find("li.tiles__tile")
+  selection.Each(func(index int, s *goquery.Selection) {
+    url := s.Find("a").AttrOr("href", "")
+    name := s.Find("h4.grid-card__title, h3.csp-square-card__title").Text()
+    price := s.Find("span.price-display, div.csp-square-card__details__price").Text()
+    image := s.Find("img").AttrOr("src", "")
+    item := Item{ Url: url, Name: name, Price: price, Image: image }
+    if name != "" {
+      items = append(items, item)
+    }
   })
   json, _ := json.Marshal(items)
   return string(json)
