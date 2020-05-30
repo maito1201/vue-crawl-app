@@ -107,7 +107,8 @@ export default {
       selectOptions: [
         { text: "ヤフオク", value: "/api/yahoo?keyword=" },
         { text: "メルカリ", value: "/api/mercari?keyword=" },
-        { text: "デジマート", value: "/api/digimart?keyword=" }
+        { text: "デジマート", value: "/api/digimart?keyword=" },
+        { text: "reverb", value: "/api/reverb?keyword=" }
       ]
     }
   },
