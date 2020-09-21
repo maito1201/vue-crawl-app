@@ -13,7 +13,7 @@ services:
   api:
     <<: *app
     container_name: go_container
-    command: go run go/api.go
+    command: sh -c "GIN_MODE=release ./go-app/main"
     environment: 
       - GOPATH=
     tty: true
