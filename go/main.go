@@ -9,6 +9,7 @@ import (
   "github.com/PuerkitoBio/goquery"
   "github.com/gin-gonic/gin"
   "github.com/gin-contrib/cors"
+  "fmt"
 )
 
 type Item struct {
@@ -119,10 +120,17 @@ func scrapeMercari(url string) string {
 
 func scrapeYahoo(url string) string {
   items := []Item{}
-  doc, err := goquery.NewDocument(url)
+  resp, err := http.Get(url)
   if err != nil {
+    fmt.Printf("error: %v\n", err)
     return("")
   }
+  doc, err := goquery.NewDocumentFromResponse(resp)
+  if err != nil {
+    fmt.Printf("error: %v\n", err)
+    return("")
+  }
+  time.Sleep(time.Second * 10)
   selection := doc.Find("ul.Products__items").Find("li.Product")
   selection.Each(func(index int, s *goquery.Selection) {
     url := s.Find("div.Product__image").Find("a").AttrOr("href", "")
@@ -133,6 +141,7 @@ func scrapeYahoo(url string) string {
     items = append(items, item)
   })
   json, _ := json.Marshal(items)
+  fmt.Printf("item %v, json %s\n", items, json)
   return string(json)
 }
 

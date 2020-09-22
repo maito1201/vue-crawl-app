@@ -11,9 +11,9 @@ services:
     ports:
       - "8000:8080"
   api:
-    <<: *app
+    build: ./go
+    command: sh -c "GIN_MODE=debug ./go-api"
     container_name: go_container
-    command: sh -c "GIN_MODE=release ./go-app/main"
     environment: 
       - GOPATH=
     tty: true
