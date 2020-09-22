@@ -12,7 +12,7 @@ services:
       - "8000:8080"
   api:
     build: ./go
-    command: sh -c "GIN_MODE=debug ./go-api"
+    command: sh -c "GIN_MODE=release ./go-api"
     container_name: go_container
     environment: 
       - GOPATH=
